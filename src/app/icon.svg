@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <!-- Brand Purple Gradient -->
+    <linearGradient id="nibGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#D946EF" />
+    </linearGradient>
+  </defs>
+
+  <!-- Nib Body with Breather Hole and Slit Cutout -->
+  <path fill="url(#nibGradient)" fill-rule="evenodd" d="
+    M 256 40
+    L 396 248
+    C 376 340 376 368 376 368
+    L 136 368
+    C 136 368 136 340 116 248
+    Z
+    M 250 85
+    L 250 216.5
+    A 24 24 0 1 0 262 216.5
+    L 262 85
+    Z
+  "/>
+
+  <!-- Base Collar / Ring -->
+  <rect x="156" y="396" width="200" height="44" rx="10" fill="url(#nibGradient)" />
+</svg>

@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink-950: #07070d;
+  --color-ink-900: #0c0c15;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-ink-950);
+    color: #e2e8f0;
+    background-image:
+      radial-gradient(60rem 40rem at 12% -10%, rgba(139, 92, 246, 0.22), transparent 60%),
+      radial-gradient(50rem 35rem at 92% 4%, rgba(236, 72, 153, 0.16), transparent 60%),
+      radial-gradient(45rem 40rem at 50% 120%, rgba(56, 189, 248, 0.12), transparent 60%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  ::selection {
+    background: rgba(167, 139, 250, 0.35);
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-white/10 bg-white/[0.035] backdrop-blur-sm;
+  }
+
+  .btn {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50;
+    @apply bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white shadow-lg shadow-violet-900/30 hover:from-violet-400 hover:to-fuchsia-400;
+  }
+
+  .btn-ghost {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50;
+    @apply border border-white/12 bg-white/[0.04] text-slate-200 hover:border-white/25 hover:bg-white/[0.08];
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+
+  .field {
+    @apply w-full rounded-xl border border-white/12 bg-white/[0.04] px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 focus:border-violet-400/60 focus:ring-2 focus:ring-violet-500/20 focus:outline-none;
+  }
+
+  .label {
+    @apply mb-1.5 block text-xs font-semibold tracking-wide text-slate-400 uppercase;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-slate-300 transition hover:border-violet-400/50 hover:text-white;
+  }
+
+  .chip-active {
+    @apply border-transparent bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white;
+  }
+
+  .stat-card {
+    @apply rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 backdrop-blur-sm;
+  }
+
+  .article-body {
+    @apply text-[1.0625rem] leading-[1.85] text-slate-300;
+  }
+
+  .article-body h2 {
+    @apply mt-10 mb-4 font-serif text-2xl font-semibold text-white;
+  }
+
+  .article-body h3 {
+    @apply mt-8 mb-3 text-lg font-semibold text-white;
+  }
+
+  .article-body p {
+    @apply my-5;
+  }
+
+  .article-body ul,
+  .article-body ol {
+    @apply my-5 space-y-2 pl-6;
+  }
+
+  .article-body ul {
+    @apply list-disc;
+  }
+
+  .article-body ol {
+    @apply list-decimal;
+  }
+
+  .article-body blockquote {
+    @apply my-6 rounded-r-xl border-l-2 border-violet-400/70 bg-violet-500/[0.07] px-5 py-3 font-serif text-lg text-violet-100 italic;
+  }
+
+  .article-body code {
+    @apply rounded-md border border-white/10 bg-black/40 px-1.5 py-0.5 font-mono text-[0.85em] text-fuchsia-200;
+  }
+
+  .article-body a {
+    @apply text-violet-300 underline decoration-violet-400/40 underline-offset-4 hover:text-violet-200;
+  }
+
+  .article-body strong {
+    @apply font-semibold text-white;
+  }
+}
+
+.verification-badge { position: absolute; right: -5px; bottom: -3px; display: grid; place-items: center; width: 21px; height: 21px; border: 2px solid #101022; border-radius: 999px; color: #fff; background: linear-gradient(135deg,#a78bfa,#ec4899 55%,#22d3ee); font-size: 12px; font-weight: 900; box-shadow: 0 0 12px #c084fc99; }
