@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { PublicUser } from "@/lib/store";
 import { Avatar } from "./avatar";
+import { DeveloperBadge } from "./developer-badge";
 
 export function UserMenu({ user }: { user: PublicUser }) {
   const [open, setOpen] = useState(false);
@@ -48,7 +49,7 @@ export function UserMenu({ user }: { user: PublicUser }) {
           className="card absolute right-0 z-30 mt-2 w-60 overflow-hidden border-white/15 bg-ink-900/95 p-2 shadow-2xl shadow-black/50"
         >
           <div className="px-3 py-2">
-            <p className="text-sm font-semibold text-white">{user.name}</p>
+            <p className="text-sm font-semibold text-white">{user.name}  <DeveloperBadge email={user.email} /></p>
             <p className="truncate text-xs text-slate-400">{user.email}</p>
           </div>
           <div className="my-1 h-px bg-white/10" />

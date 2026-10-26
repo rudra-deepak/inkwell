@@ -53,12 +53,12 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
 
     
           <h1 className="mt-4 font-serif text-4xl leading-tight font-semibold text-white sm:text-5xl">
-            Write it down. Publish it. Argue about it in the comments.
+            Write it down. Publish it. Argue about it in the Community.
           </h1>
           <p className="mt-4 text-base leading-relaxed text-slate-300">
-            Inkwell is a small blogging platform with real accounts, real editing, and a comment thread
-            that stays civil because it is only one level deep. Everything is stored in a single JSON file
-            on this machine — sessions included.
+            Inkwell is a Local-First blogging platform with real accounts, real editing, and a comment thread
+            that stays civil because it is only one level deep.
+             Every Drafts are encrypted and stored locally, and only published when you want to.
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <Link href={viewer ? "/new" : "/register"} className="btn-primary">

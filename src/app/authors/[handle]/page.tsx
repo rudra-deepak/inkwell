@@ -4,6 +4,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { findUserByHandle, listPosts } from "@/lib/store";
 import { Avatar, formatDate } from "@/components/avatar";
 import { PostCard } from "@/components/post-card";
+import { ProfileSocial } from "@/components/profile-social";
+import { DeveloperBadge } from "@/components/developer-badge";
 
 export const dynamic = "force-dynamic";
 
@@ -17,10 +19,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function AuthorPage({ params }: Props) {
   const { handle } = await params;
-  const author = await findUserByHandle(handle);
-  if (!author) notFound();
-
   const viewer = await getCurrentUser();
+  const author = await findUserByHandle(handle, viewer?.id ?? null);
+  if (!author) notFound();
   const posts = await listPosts({ authorHandle: author.handle, viewerId: viewer?.id ?? null });
   const likesReceived = posts.reduce((sum, post) => sum + post.likeCount, 0);
 
@@ -30,12 +31,17 @@ export default async function AuthorPage({ params }: Props) {
         <div className="flex items-center gap-4">
           <Avatar name={author.name} color={author.avatarColor} image={author.avatarImage} verified={author.verified} size="lg" />
           <div>
-            <h1 className="font-serif text-3xl font-semibold text-white">{author.name}</h1>
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="font-serif text-3xl font-semibold text-white">{author.name}</h1>
+              <DeveloperBadge email={author.email} />
+            </div>
             <p className="text-sm text-slate-400">@{author.handle} · joined {formatDate(author.createdAt)}</p>
             <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-300">{author.bio}</p>
           </div>
         </div>
-        <dl className="grid grid-cols-3 gap-3 text-center">
+        <div className="flex flex-col gap-3 sm:items-end">
+          <ProfileSocial author={author} signedIn={Boolean(viewer)} isOwnProfile={viewer?.id === author.id} />
+          <dl className="grid grid-cols-3 gap-3 text-center">
           {[
             { label: "Posts", value: posts.length },
             { label: "Likes", value: likesReceived },
@@ -46,7 +52,8 @@ export default async function AuthorPage({ params }: Props) {
               <dd className="font-serif text-xl text-white">{stat.value}</dd>
             </div>
           ))}
-        </dl>
+          </dl>
+        </div>
       </header>
 
       <section className="space-y-5">

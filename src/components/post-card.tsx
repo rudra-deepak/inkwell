@@ -1,6 +1,9 @@
+
+
 import Link from "next/link";
 import type { PostView } from "@/lib/store";
 import { Avatar, timeAgo } from "./avatar";
+import { DeveloperBadge } from "./developer-badge";
 
 export function TagList({ tags, active }: { tags: string[]; active?: string }) {
   if (!tags.length) return null;
@@ -52,6 +55,8 @@ export function PostCard({ post, featured = false }: { post: PostView; featured?
         ) : null}
       </Link>
 
+      
+
       <div className="flex flex-1 flex-col gap-3 p-5">
         <TagList tags={post.tags.slice(0, 3)} />
 
@@ -73,15 +78,25 @@ export function PostCard({ post, featured = false }: { post: PostView; featured?
               size="sm"
               href={`/authors/${post.author.handle}`}
             />
-            <div className="leading-tight">
-              <Link href={`/authors/${post.author.handle}`} className="text-xs font-semibold text-slate-200 hover:text-white">
-                {post.author.name}
-              </Link>
-              <p className="text-[11px] text-slate-500">
-                {timeAgo(post.createdAt)} · {post.readingMinutes} min read
-              </p>
-            </div>
+            
+           <div className="leading-tight">
+  <Link 
+    href={`/authors/${post.author.handle}`} 
+    className="inline-flex items-center gap-1 text-xs font-semibold text-slate-200 hover:text-white whitespace-nowrap"
+  >
+    <span>{post.author.name}</span>
+    <span className="scale-80 origin-left inline-flex items-center -mr-3">
+      <DeveloperBadge email={post.author.email} />
+    </span>
+  </Link>
+  
+  <p className="text-[11px] text-slate-500 mt-0.5">
+    {timeAgo(post.createdAt)} · {post.readingMinutes} min read
+  </p>
+</div>
+
           </div>
+          
           <div className="flex items-center gap-3 text-[11px] text-slate-400">
             <span title="Comments">💬 {post.commentCount}</span>
             <span title="Likes">♥ {post.likeCount}</span>

@@ -2,6 +2,7 @@ import type { Collection, Filter } from "mongodb";
 import { getDb } from "./mongodb";
 import { hashPassword, randomId, randomToken, verifyPassword } from "./password";
 
+
 /* ------------------------------------------------------------------ *
  * MongoDB-backed persistence layer.
  *
@@ -75,6 +76,14 @@ export type LikeDoc = {
   createdAt: Date;
 };
 
+/** One directed relationship: followerId follows followingId. */
+export type FollowDoc = {
+  _id: string; // `${followerId}:${followingId}` keeps the relationship unique
+  followerId: string;
+  followingId: string;
+  createdAt: Date;
+};
+
 export type PublicUser = {
   id: string;
   name: string;
@@ -86,6 +95,9 @@ export type PublicUser = {
   createdAt: string;
   postCount: number;
   commentCount: number;
+  followerCount: number;
+  followingCount: number;
+  isFollowing: boolean;
   verified: boolean;
 };
 
@@ -211,6 +223,7 @@ async function initialize(): Promise<void> {
   const posts = db.collection<PostDoc>("posts");
   const comments = db.collection<CommentDoc>("comments");
   const likes = db.collection<LikeDoc>("likes");
+  const follows = db.collection<FollowDoc>("follows");
 
   await Promise.all([
     users.createIndex({ email: 1 }, { unique: true }),
@@ -226,6 +239,9 @@ async function initialize(): Promise<void> {
     comments.createIndex({ parentId: 1 }),
     likes.createIndex({ postId: 1 }),
     likes.createIndex({ userId: 1 }),
+    follows.createIndex({ followerId: 1, followingId: 1 }, { unique: true }),
+    follows.createIndex({ followingId: 1, createdAt: -1 }),
+    follows.createIndex({ followerId: 1, createdAt: -1 }),
   ]);
 
   if ((await users.countDocuments({})) === 0) {
@@ -258,6 +274,10 @@ async function likesCol(): Promise<Collection<LikeDoc>> {
   await ready();
   return (await getDb()).collection<LikeDoc>("likes");
 }
+async function followsCol(): Promise<Collection<FollowDoc>> {
+  await ready();
+  return (await getDb()).collection<FollowDoc>("follows");
+}
 
 /** Probe used by /api/health. */
 export async function getStoreHealth() {
@@ -282,11 +302,16 @@ export async function getStoreHealth() {
 
 /* ------------------------- view projections ----------------------- */
 
-export async function toPublicUser(user: UserDoc): Promise<PublicUser> {
-  const [posts, comments] = await Promise.all([postsCol(), commentsCol()]);
-  const [postCount, commentCount] = await Promise.all([
+export async function toPublicUser(user: UserDoc, viewerId?: string | null): Promise<PublicUser> {
+  const [posts, comments, follows] = await Promise.all([postsCol(), commentsCol(), followsCol()]);
+  const [postCount, commentCount, followerCount, followingCount, isFollowing] = await Promise.all([
     posts.countDocuments({ authorId: user._id }),
     comments.countDocuments({ authorId: user._id }),
+    follows.countDocuments({ followingId: user._id }),
+    follows.countDocuments({ followerId: user._id }),
+    viewerId && viewerId !== user._id
+      ? follows.findOne({ followerId: viewerId, followingId: user._id }, { projection: { _id: 1 } }).then(Boolean)
+      : Promise.resolve(false),
   ]);
   return {
     id: user._id,
@@ -299,6 +324,9 @@ export async function toPublicUser(user: UserDoc): Promise<PublicUser> {
     createdAt: user.createdAt.toISOString(),
     postCount,
     commentCount,
+    followerCount,
+    followingCount,
+    isFollowing,
     verified: Boolean(user.verified),
   };
 }
@@ -469,10 +497,47 @@ export async function findUserById(id: string) {
   return users.findOne({ _id: id });
 }
 
-export async function findUserByHandle(handle: string) {
+export async function findUserByHandle(handle: string, viewerId?: string | null) {
   const users = await usersCol();
   const user = await users.findOne({ handle: handle.toLowerCase() });
-  return user ? toPublicUser(user) : null;
+  return user ? toPublicUser(user, viewerId) : null;
+}
+
+export async function followUser(followerId: string, handle: string) {
+  const users = await usersCol();
+  const target = await users.findOne({ handle: handle.toLowerCase() });
+  if (!target) throw new StoreError("Author not found.", 404);
+  if (target._id === followerId) throw new StoreError("You can't follow yourself.", 422);
+  const follows = await followsCol();
+  try {
+    await follows.insertOne({ _id: `${followerId}:${target._id}`, followerId, followingId: target._id, createdAt: new Date() });
+  } catch (error) {
+    if (!isDuplicateKeyError(error)) throw error;
+  }
+  return toPublicUser(target, followerId);
+}
+
+export async function unfollowUser(followerId: string, handle: string) {
+  const users = await usersCol();
+  const target = await users.findOne({ handle: handle.toLowerCase() });
+  if (!target) throw new StoreError("Author not found.", 404);
+  await (await followsCol()).deleteOne({ followerId, followingId: target._id });
+  return toPublicUser(target, followerId);
+}
+
+export async function listUserConnections(handle: string, kind: "followers" | "following") {
+  const users = await usersCol();
+  const subject = await users.findOne({ handle: handle.toLowerCase() });
+  if (!subject) throw new StoreError("Author not found.", 404);
+  const follows = await followsCol();
+  const links = await follows.find(kind === "followers" ? { followingId: subject._id } : { followerId: subject._id }).sort({ createdAt: -1 }).toArray();
+  const ids = links.map((link) => (kind === "followers" ? link.followerId : link.followingId));
+  const people = await users.find({ _id: { $in: ids } }).toArray();
+  const byId = new Map(people.map((person) => [person._id, person]));
+  return Promise.all(ids.flatMap((id) => {
+    const person = byId.get(id);
+    return person ? [toPublicUser(person)] : [];
+  }));
 }
 
 export async function updateUser(

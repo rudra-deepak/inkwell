@@ -10,6 +10,7 @@ import { LikeButton } from "@/components/like-button";
 import { PostCard, TagList } from "@/components/post-card";
 import { Prose } from "@/components/prose";
 import { ViewTracker } from "@/components/view-tracker";
+import { DeveloperBadge } from "@/components/developer-badge";
 
 export const dynamic = "force-dynamic";
 
@@ -62,7 +63,7 @@ export default async function PostPage({ params }: Props) {
         <div className="flex flex-wrap items-center justify-between gap-4 border-y border-white/10 py-4">
           <div className="flex items-center gap-3">
             <Avatar
-              name={post.author.name}
+              name={post.author.name} 
               color={post.author.avatarColor}
               image={post.author.avatarImage}
               verified={post.author.verified}

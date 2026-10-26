@@ -5,6 +5,7 @@ import { Avatar, timeAgo } from "@/components/avatar";
 import { DeletePostButton } from "@/components/delete-post-button";
 import { ProfileForm } from "@/components/profile-form";
 import { VerificationRequestForm } from "@/components/verification-request-form";
+import { DeveloperBadge } from "@/components/developer-badge";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Dashboard" };
@@ -26,10 +27,10 @@ export default async function DashboardPage() {
     <div className="space-y-8 pt-8">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <Avatar name={user.name} color={user.avatarColor} image={user.avatarImage} verified={user.verified} size="lg" />
+          <Avatar name={user.name}  color={user.avatarColor} image={user.avatarImage} verified={user.verified} size="lg" />
           <div>
             <p className="text-xs font-semibold tracking-wider text-violet-300 uppercase">Dashboard</p>
-            <h1 className="font-serif text-3xl font-semibold text-white">{user.name}</h1>
+            <h1 className="font-serif text-3xl font-semibold text-white">{user.name}  <DeveloperBadge email={user.email} /></h1>
             <p className="text-sm text-slate-400">
               @{user.handle} · member since {new Date(user.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
             </p>

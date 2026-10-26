@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     template: "%s · Inkwell",
   },
   description:
-    "Inkwell is a local-first blogging platform: write posts, publish them, and talk about them in the comments.",
+    "Inkwell is a local-first blogging platform: write posts, publish them, and talk about them in the community.",
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
